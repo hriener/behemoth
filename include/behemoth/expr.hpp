@@ -102,26 +102,6 @@ public:
     return index;
   }
 
-  std::string as_string( unsigned e ) const
-  {
-    const auto& expr = _exprs[ e ];
-
-    auto str = expr._name;
-    if ( expr._children.size() > 0u )
-    {
-      str += '(';
-      str += as_string( expr._children[ 0u ] );
-      for ( auto i = 1u; i < _exprs[ e ]._children.size(); ++i )
-      {
-        str += ',';
-        str += as_string( expr._children[ i ] );
-      }
-      str += ')';
-    }
-
-    return str;
-  }
-
   unsigned count_nonterminals( unsigned e ) const
   {
     const auto& expr = _exprs[ e ];
@@ -159,6 +139,36 @@ public:
   fun_strash_map_t _fun_strash;
   std::vector<expr_node> _exprs;
 }; // context
+
+class expr_printer
+{
+public:
+  expr_printer( const context& ctx )
+    : _ctx( ctx )
+  {}
+
+  virtual std::string as_string( unsigned e ) const
+  {
+    const auto& expr = _ctx._exprs[ e ];
+
+    auto str = expr._name;
+    if ( expr._children.size() > 0u )
+    {
+      str += '(';
+      str += as_string( expr._children[ 0u ] );
+      for ( auto i = 1u; i < expr._children.size(); ++i )
+      {
+        str += ',';
+        str += as_string( expr._children[ i ] );
+      }
+      str += ')';
+    }
+
+    return str;
+  }
+
+  const context& _ctx;
+};
 
 } // namespace behemoth
 

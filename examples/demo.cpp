@@ -31,13 +31,14 @@
 class counting_enumerator : public behemoth::enumerator
 {
 public:
-  counting_enumerator( behemoth::context& ctx, const behemoth::rules_t& rules, int max_cost )
+  counting_enumerator( behemoth::context& ctx, const behemoth::expr_printer& printer, const behemoth::rules_t& rules, int max_cost )
     : enumerator( ctx, rules, max_cost )
+    , printer( printer )
   {}
 
   virtual void on_concrete_expression( behemoth::cexpr_t e ) override
   {
-    std::cout << ctx.as_string( e.first ) << ' ' << e.second << std::endl;
+    std::cout << printer.as_string( e.first ) << ' ' << e.second << std::endl;
     ++number_of_expressions;
   }
 
@@ -47,11 +48,13 @@ public:
   }
 
   unsigned long number_of_expressions = 0u;
-}; // expression_enumerator
+  const behemoth::expr_printer& printer;
+}; // counting_enumerator
 
 int main( int argc, char *argv[] )
 {
   behemoth::context ctx;
+  behemoth::expr_printer printer( ctx );
 
   CLI::App app{ "Demo application for enumeraing AND-NOT structures over a fixed number of variables" };
 
@@ -78,7 +81,7 @@ int main( int argc, char *argv[] )
     rules.push_back( behemoth::rule_t{ _N, v } );
   }
 
-  counting_enumerator en( ctx, rules, max_cost );
+  counting_enumerator en( ctx, printer, rules, max_cost );
   en.add_expression( _N );
   while ( en.is_running() )
   {
