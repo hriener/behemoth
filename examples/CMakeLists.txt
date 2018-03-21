@@ -7,3 +7,4 @@ function(add_example name)
 endfunction()
 
 add_example(demo demo.cpp)
+add_example(ltl ltl.cpp)
