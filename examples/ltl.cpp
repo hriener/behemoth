@@ -92,7 +92,7 @@ int main( int argc, char *argv[] )
   behemoth::context ctx;
   ltl_expr_printer printer( ctx );
 
-  CLI::App app{ "Demo application for enumeraing simple LTL formulae over a fixed number of variables" };
+  CLI::App app{ "Demo application for enumerating simple LTL formulae over a fixed number of variables" };
 
   int num_variables = 3;
   app.add_option( "-v,--vars", num_variables, "Number of variables" );
