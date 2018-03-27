@@ -53,8 +53,10 @@ public:
 
 int main( int argc, char *argv[] )
 {
-  behemoth::context ctx;
-  behemoth::expr_printer printer( ctx );
+  using namespace behemoth;
+
+  context ctx;
+  expr_printer printer( ctx );
 
   CLI::App app{ "Demo application for enumeraing AND-NOT structures over a fixed number of variables" };
 
@@ -64,21 +66,21 @@ int main( int argc, char *argv[] )
   int max_cost = 5;
   app.add_option( "-c,--cost", max_cost, "Maximum bound on the number of rules" );
 
-  std::vector<behemoth::rule_t> rules;
+  std::vector<rule_t> rules;
 
   CLI11_PARSE( app, argc, argv );
 
   const auto _N = ctx.make_fun( "_N" );
-  const auto _not = ctx.make_fun( "not", { _N } );
+  const auto _not = ctx.make_fun( "not", { _N }, expr_attr::_not );
   const auto _and = ctx.make_fun( "and", { _N, _N } );
 
-  rules.push_back( behemoth::rule_t{ _N, _not } );
-  rules.push_back( behemoth::rule_t{ _N, _and } );
+  rules.push_back( rule_t{ _N, _not } );
+  rules.push_back( rule_t{ _N, _and } );
 
   for ( auto i = 0; i < num_variables; ++i )
   {
     const auto v = ctx.make_fun( fmt::format( "x{}", i ) );
-    rules.push_back( behemoth::rule_t{ _N, v } );
+    rules.push_back( rule_t{ _N, v } );
   }
 
   counting_enumerator en( ctx, printer, rules, max_cost );
@@ -88,6 +90,6 @@ int main( int argc, char *argv[] )
     en.deduce();
   }
   en.print_statistics();
-  
+
   return 0;
 }

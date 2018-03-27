@@ -34,14 +34,25 @@ namespace behemoth
 {
 
 /******************************************************************************
+ * expr_attr                                                                  *
+ ******************************************************************************/
+
+enum class expr_attr
+{
+  _no = 0,
+  _not,
+}; // expr_attr
+
+/******************************************************************************
  * expr_node                                                                  *
  ******************************************************************************/
 
 struct expr_node
 {
-  expr_node( std::string name, const std::vector<unsigned>& children )
+  expr_node( std::string name, const std::vector<unsigned>& children, const expr_attr attr = expr_attr::_no )
     : _name( name )
     , _children( children )
+    , _attr( attr )
   {}
 
   bool operator==( const expr_node& e ) const
@@ -60,6 +71,7 @@ struct expr_node
 
   std::string _name;
   std::vector<unsigned> _children;
+  expr_attr _attr;
 }; // expr_node
 
 struct expr_hash : public std::unary_function<expr_node, std::size_t>
@@ -85,9 +97,9 @@ private:
   using fun_strash_map_t = std::unordered_map<expr_node, unsigned, expr_hash >;
 
 public:
-  unsigned make_fun( const std::string& name, const std::vector<unsigned>& children = {} )
+  unsigned make_fun( const std::string& name, const std::vector<unsigned>& children = {}, const expr_attr attr = expr_attr::_no )
   {
-    const auto e = expr_node( name, children );
+    const auto e = expr_node( name, children, attr );
 
     /* structural hashing */
     auto it = _fun_strash.find( e );

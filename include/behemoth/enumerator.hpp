@@ -170,7 +170,7 @@ std::vector<unsigned> refine_expression_recurse( context& ctx, unsigned e, path_
       new_children.push_back( ctx._exprs[ e ]._children[ i ] );
     }
 
-    results.push_back( ctx.make_fun( ctx._exprs[ e ]._name, new_children ) );
+    results.push_back( ctx.make_fun( ctx._exprs[ e ]._name, new_children, ctx._exprs[ e ]._attr ) );
   }
 
   return results;
@@ -236,6 +236,8 @@ public:
   void deduce( unsigned number_of_steps = 1u );
 
   virtual bool is_redundant_in_search_order( unsigned e ) const;
+
+  bool check_double_negation( unsigned e ) const;
 
   virtual void on_expression( cexpr_t e )
   {
@@ -326,9 +328,40 @@ void enumerator::deduce( unsigned number_of_steps )
   }
 }
 
+bool enumerator::check_double_negation( unsigned e ) const
+{
+  const auto expr = ctx._exprs[ e ];
+
+  /* no double-negation */
+  if ( expr._name[0] != '_' && expr._attr == expr_attr::_not )
+  {
+    assert( expr._children.size() == 1u );
+    const auto child0 = ctx._exprs[ expr._children[0u] ];
+    if ( child0._name[0] != '_' && child0._attr == expr_attr::_not )
+    {
+      return true;
+    }
+  }
+
+  for ( const auto& c : expr._children )
+  {
+    if ( check_double_negation( c ) )
+    {
+      return true;
+    }
+  }
+
+  return false;
+}
+
 bool enumerator::is_redundant_in_search_order( unsigned e ) const
 {
-  /* keep every expression */
+  if ( check_double_negation( e ) )
+  {
+    return true;
+  }
+
+  /* keep all other expressions */
   return false;
 }
 
