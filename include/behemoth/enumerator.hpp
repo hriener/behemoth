@@ -237,7 +237,8 @@ public:
 
   virtual bool is_redundant_in_search_order( unsigned e ) const;
 
-  bool check_double_negation( unsigned e ) const;
+  inline bool check_double_negation( unsigned e ) const;
+  inline bool check_commutative( unsigned e ) const;
 
   virtual void on_expression( cexpr_t e )
   {
@@ -354,6 +355,31 @@ bool enumerator::check_double_negation( unsigned e ) const
   return false;
 }
 
+bool enumerator::check_commutative( unsigned e ) const
+{
+  const auto expr = ctx._exprs[ e ];
+
+  if ( expr._name[0] != '_' && expr._children.size() == 2u && expr._attr == expr_attr::_commutative )
+  {
+    if ( (ctx.count_nonterminals( expr._children[0u] ) == 0) &&
+         (ctx.count_nonterminals( expr._children[1u] ) == 0) &&
+         expr._children[0u] > expr._children[1u] )
+    {
+      return true;
+    }
+  }
+
+  for ( const auto& c : expr._children )
+  {
+    if ( check_commutative( c ) )
+    {
+      return true;
+    }
+  }
+
+  return false;
+}
+
 bool enumerator::is_redundant_in_search_order( unsigned e ) const
 {
   if ( check_double_negation( e ) )
@@ -361,17 +387,9 @@ bool enumerator::is_redundant_in_search_order( unsigned e ) const
     return true;
   }
 
-  const auto expr = ctx._exprs[ e ];
-  if ( expr._name[0] != '_' && expr._children.size() == 2u && expr._attr == expr_attr::_commutative )
+  if ( check_commutative( e ) )
   {
-    if ( (ctx.count_nonterminals( expr._children[0u] ) == 0) &&
-         (ctx.count_nonterminals( expr._children[1u] ) == 0) &&
-         expr._children[0u] > expr._children[1u] )
-    {
-      // expr_printer printer( ctx );
-      // std::cout << "REDUNDANT: " << printer.as_string( e ) << std::endl;
-      return true;
-    }
+    return true;
   }
 
   /* keep all other expressions */
