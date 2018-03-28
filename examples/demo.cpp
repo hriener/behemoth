@@ -72,7 +72,7 @@ int main( int argc, char *argv[] )
 
   const auto _N = ctx.make_fun( "_N" );
   const auto _not = ctx.make_fun( "not", { _N }, expr_attr::_not );
-  const auto _and = ctx.make_fun( "and", { _N, _N } );
+  const auto _and = ctx.make_fun( "and", { _N, _N }, expr_attr::_commutative );
 
   rules.push_back( rule_t{ _N, _not } );
   rules.push_back( rule_t{ _N, _and } );

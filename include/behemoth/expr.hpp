@@ -41,6 +41,7 @@ enum class expr_attr
 {
   _no = 0,
   _not,
+  _commutative // order is immaterial
 }; // expr_attr
 
 /******************************************************************************
@@ -102,13 +103,13 @@ public:
     const auto e = expr_node( name, children, attr );
 
     /* structural hashing */
-    auto it = _fun_strash.find( e );
+    const auto it = _fun_strash.find( e );
     if ( it != _fun_strash.end() )
     {
       return it->second;
     }
 
-    auto index = _exprs.size();
+    const auto index = _exprs.size();
     _exprs.push_back( e );
     _fun_strash[e] = index;
     return index;

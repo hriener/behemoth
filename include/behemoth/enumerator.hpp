@@ -361,6 +361,19 @@ bool enumerator::is_redundant_in_search_order( unsigned e ) const
     return true;
   }
 
+  const auto expr = ctx._exprs[ e ];
+  if ( expr._name[0] != '_' && expr._children.size() == 2u && expr._attr == expr_attr::_commutative )
+  {
+    if ( (ctx.count_nonterminals( expr._children[0u] ) == 0) &&
+         (ctx.count_nonterminals( expr._children[1u] ) == 0) &&
+         expr._children[0u] > expr._children[1u] )
+    {
+      // expr_printer printer( ctx );
+      // std::cout << "REDUNDANT: " << printer.as_string( e ) << std::endl;
+      return true;
+    }
+  }
+
   /* keep all other expressions */
   return false;
 }
