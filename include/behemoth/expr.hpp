@@ -37,12 +37,15 @@ namespace behemoth
  * expr_attr                                                                  *
  ******************************************************************************/
 
-enum class expr_attr
+enum expr_attr_enum
 {
-  _no = 0,
-  _not,
-  _commutative // order is immaterial
+  _no          = 0,
+  _not         = 1,
+  _idempotent  = 1 << 1, /* repetition is immaterial */
+  _commutative = 1 << 2 /* order is immaterial */
 }; // expr_attr
+
+using expr_attr = unsigned;
 
 /******************************************************************************
  * expr_node                                                                  *
@@ -50,7 +53,7 @@ enum class expr_attr
 
 struct expr_node
 {
-  expr_node( std::string name, const std::vector<unsigned>& children, const expr_attr attr = expr_attr::_no )
+  expr_node( std::string name, const std::vector<unsigned>& children, const expr_attr attr = expr_attr_enum::_no )
     : _name( name )
     , _children( children )
     , _attr( attr )
@@ -98,7 +101,7 @@ private:
   using fun_strash_map_t = std::unordered_map<expr_node, unsigned, expr_hash >;
 
 public:
-  unsigned make_fun( const std::string& name, const std::vector<unsigned>& children = {}, const expr_attr attr = expr_attr::_no )
+  unsigned make_fun( const std::string& name, const std::vector<unsigned>& children = {}, const expr_attr attr = expr_attr_enum::_no )
   {
     const auto e = expr_node( name, children, attr );
 

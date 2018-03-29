@@ -105,11 +105,9 @@ int main( int argc, char *argv[] )
   CLI11_PARSE( app, argc, argv );
 
   const auto _N = ctx.make_fun( "_N" );
-  const auto _not = ctx.make_fun( "!", { _N } );
-  const auto _and = ctx.make_fun( "&", { _N, _N } );
-  const auto _or = ctx.make_fun( "or", { _N, _N } );
-  const auto _globally = ctx.make_fun( "G", { _N } );
-  const auto _eventually = ctx.make_fun( "F", { _N } );
+  const auto _not = ctx.make_fun( "!", { _N }, behemoth::expr_attr_enum::_not );
+  const auto _and = ctx.make_fun( "&", { _N, _N }, behemoth::expr_attr_enum::_idempotent | behemoth::expr_attr_enum::_commutative );
+  const auto _or = ctx.make_fun( "|", { _N, _N }, behemoth::expr_attr_enum::_idempotent | behemoth::expr_attr_enum::_commutative  );
   const auto _next = ctx.make_fun( "X", { _N } );
   const auto _until = ctx.make_fun( "U", { _N, _N } );
 

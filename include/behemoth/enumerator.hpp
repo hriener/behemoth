@@ -238,7 +238,7 @@ public:
   virtual bool is_redundant_in_search_order( unsigned e ) const;
 
   inline bool check_double_negation( unsigned e ) const;
-  inline bool check_commutative( unsigned e ) const;
+  inline bool check_idempotence_and_commutative( unsigned e ) const;
 
   virtual void on_expression( cexpr_t e )
   {
@@ -297,7 +297,7 @@ void enumerator::deduce( unsigned number_of_steps )
 
     if ( next_candidate.second > current_costs )
     {
-      std::cout << "[i] finished considered expressions of cost " << (current_costs+1u) << std::endl;
+      std::cout << "[i] finished considering expressions of cost " << (current_costs+1u) << std::endl;
       current_costs = next_candidate.second;
     }
 
@@ -334,11 +334,11 @@ bool enumerator::check_double_negation( unsigned e ) const
   const auto expr = ctx._exprs[ e ];
 
   /* no double-negation */
-  if ( expr._name[0] != '_' && expr._attr == expr_attr::_not )
+  if ( expr._name[0] != '_' && (expr._attr & expr_attr_enum::_not) == expr_attr_enum::_not )
   {
     assert( expr._children.size() == 1u );
     const auto child0 = ctx._exprs[ expr._children[0u] ];
-    if ( child0._name[0] != '_' && child0._attr == expr_attr::_not )
+    if ( child0._name[0] != '_' && child0._attr == expr_attr_enum::_not )
     {
       return true;
     }
@@ -355,15 +355,27 @@ bool enumerator::check_double_negation( unsigned e ) const
   return false;
 }
 
-bool enumerator::check_commutative( unsigned e ) const
+bool enumerator::check_idempotence_and_commutative( unsigned e ) const
 {
-  const auto expr = ctx._exprs[ e ];
+  const auto is_set = []( unsigned value, unsigned flag ) { return ( ( value & flag ) == flag ); };
 
-  if ( expr._name[0] != '_' && expr._children.size() == 2u && expr._attr == expr_attr::_commutative )
+  const auto expr = ctx._exprs[ e ];
+  if ( expr._name[0] != '_' && expr._children.size() == 2u &&
+       (ctx.count_nonterminals( expr._children[0u] ) == 0) &&
+       (ctx.count_nonterminals( expr._children[1u] ) == 0) )
   {
-    if ( (ctx.count_nonterminals( expr._children[0u] ) == 0) &&
-         (ctx.count_nonterminals( expr._children[1u] ) == 0) &&
-         expr._children[0u] > expr._children[1u] )
+    if ( is_set( expr._attr, expr_attr_enum::_idempotent | expr_attr_enum::_commutative ) &&
+         expr._children[0u] >= expr._children[1u] )
+    {
+      return true;
+    }
+    else if ( is_set( expr._attr, expr_attr_enum::_commutative ) &&
+              expr._children[0u] > expr._children[1u] )
+    {
+      return true;
+    }
+    else if ( is_set( expr._attr, expr_attr_enum::_idempotent ) &&
+              expr._children[0u] == expr._children[1u] )
     {
       return true;
     }
@@ -371,7 +383,7 @@ bool enumerator::check_commutative( unsigned e ) const
 
   for ( const auto& c : expr._children )
   {
-    if ( check_commutative( c ) )
+    if ( check_idempotence_and_commutative( c ) )
     {
       return true;
     }
@@ -387,7 +399,7 @@ bool enumerator::is_redundant_in_search_order( unsigned e ) const
     return true;
   }
 
-  if ( check_commutative( e ) )
+  if ( check_idempotence_and_commutative( e ) )
   {
     return true;
   }
