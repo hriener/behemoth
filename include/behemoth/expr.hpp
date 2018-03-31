@@ -39,10 +39,10 @@ namespace behemoth
 
 enum expr_attr_enum
 {
-  _no          = 0,
-  _not         = 1,
-  _idempotent  = 1 << 1, /* repetition is immaterial */
-  _commutative = 1 << 2 /* order is immaterial */
+  _no                    = 0,
+  _no_double_application = 1,
+  _idempotent            = 1 << 1, /* repetition is immaterial */
+  _commutative           = 1 << 2  /* order is immaterial */
 }; // expr_attr
 
 using expr_attr = unsigned;

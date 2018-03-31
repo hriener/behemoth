@@ -71,7 +71,7 @@ int main( int argc, char *argv[] )
   CLI11_PARSE( app, argc, argv );
 
   const auto _N = ctx.make_fun( "_N" );
-  const auto _not = ctx.make_fun( "not", { _N }, expr_attr_enum::_not );
+  const auto _not = ctx.make_fun( "not", { _N }, expr_attr_enum::_no_double_application );
   const auto _and = ctx.make_fun( "and", { _N, _N }, expr_attr_enum::_idempotent | expr_attr_enum::_commutative );
 
   rules.push_back( rule_t{ _N, _not } );

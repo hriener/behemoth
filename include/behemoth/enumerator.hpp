@@ -237,7 +237,7 @@ public:
 
   virtual bool is_redundant_in_search_order( unsigned e ) const;
 
-  inline bool check_double_negation( unsigned e ) const;
+  inline bool check_double_application( unsigned e ) const;
   inline bool check_idempotence_and_commutative( unsigned e ) const;
 
   virtual void on_expression( cexpr_t e )
@@ -329,16 +329,16 @@ void enumerator::deduce( unsigned number_of_steps )
   }
 }
 
-bool enumerator::check_double_negation( unsigned e ) const
+bool enumerator::check_double_application( unsigned e ) const
 {
   const auto expr = ctx._exprs[ e ];
 
   /* no double-negation */
-  if ( expr._name[0] != '_' && (expr._attr & expr_attr_enum::_not) == expr_attr_enum::_not )
+  if ( expr._name[0] != '_' && (expr._attr & expr_attr_enum::_no_double_application) == expr_attr_enum::_no_double_application )
   {
     assert( expr._children.size() == 1u );
     const auto child0 = ctx._exprs[ expr._children[0u] ];
-    if ( child0._name[0] != '_' && child0._attr == expr_attr_enum::_not )
+    if ( child0._name == expr._name && child0._attr == expr_attr_enum::_no_double_application )
     {
       return true;
     }
@@ -346,7 +346,7 @@ bool enumerator::check_double_negation( unsigned e ) const
 
   for ( const auto& c : expr._children )
   {
-    if ( check_double_negation( c ) )
+    if ( check_double_application( c ) )
     {
       return true;
     }
@@ -394,7 +394,7 @@ bool enumerator::check_idempotence_and_commutative( unsigned e ) const
 
 bool enumerator::is_redundant_in_search_order( unsigned e ) const
 {
-  if ( check_double_negation( e ) )
+  if ( check_double_application( e ) )
   {
     return true;
   }
