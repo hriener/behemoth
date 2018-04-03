@@ -8,3 +8,4 @@ endfunction()
 
 add_example(demo demo.cpp)
 add_example(ltl ltl.cpp)
+add_example(ctl ctl.cpp)
