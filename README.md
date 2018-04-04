@@ -5,7 +5,7 @@ behemoth is a C++ library for syntax-guided enumeration and synthesis.
 
 ## Example
 
-The following code snippet enumerates expressions over a simple grammar with the two function symbols `not(.)` and `and(.)`.
+The following code snippet enumerates expressions over a simple grammar with the two function symbols `not(.)` and `and(.,.)`.
 
 ```c++
 #include <behemoth/enumerator.hpp>
