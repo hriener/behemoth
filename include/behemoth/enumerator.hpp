@@ -38,6 +38,7 @@ struct rule_t
 {
   unsigned match;
   unsigned replace;
+  unsigned cost = 1;
 };
 
 using rules_t = std::vector<rule_t>;
@@ -129,17 +130,17 @@ struct path_t
   unsigned depth;
 }; // path_t
 
-std::vector<unsigned> refine_expression_recurse( context& ctx, unsigned e, path_t path, const rules_t& rules )
+std::vector<std::pair<unsigned,unsigned>> refine_expression_recurse( context& ctx, unsigned e, path_t path, const rules_t& rules )
 {
   if ( path.indices.size() == 0u )
   {
     /* apply all rules */
-    std::vector<unsigned> results;
+    std::vector<std::pair<unsigned,unsigned>> results;
     for ( const auto& r : rules )
     {
       if ( e == r.match )
       {
-        results.push_back( r.replace );
+        results.push_back( {r.replace, r.cost} );
       }
     }
     return results;
@@ -150,7 +151,7 @@ std::vector<unsigned> refine_expression_recurse( context& ctx, unsigned e, path_
 
   auto candidates = refine_expression_recurse( ctx, ctx._exprs[ e ]._children[ index ], path, rules );
 
-  std::vector<unsigned> results;
+  std::vector<std::pair<unsigned,unsigned>> results;
   for ( const auto& c : candidates )
   {
     std::vector<unsigned> new_children;
@@ -162,7 +163,7 @@ std::vector<unsigned> refine_expression_recurse( context& ctx, unsigned e, path_
     }
 
     /* add new instantiation */
-    new_children.push_back( c );
+    new_children.push_back( c.first );
 
     /* copy the children after index */
     for ( auto i = index+1; i < ctx._exprs[ e ]._children.size(); ++i )
@@ -170,7 +171,7 @@ std::vector<unsigned> refine_expression_recurse( context& ctx, unsigned e, path_
       new_children.push_back( ctx._exprs[ e ]._children[ i ] );
     }
 
-    results.push_back( ctx.make_fun( ctx._exprs[ e ]._name, new_children, ctx._exprs[ e ]._attr ) );
+    results.push_back( {ctx.make_fun( ctx._exprs[ e ]._name, new_children, ctx._exprs[ e ]._attr ), c.second} );
   }
 
   return results;
@@ -312,12 +313,12 @@ void enumerator::deduce( unsigned number_of_steps )
     for ( const auto& c : new_candidates )
     {
       if ( !is_running() ) break;
-      if ( is_redundant_in_search_order( c ) ) continue;
+      if ( is_redundant_in_search_order( c.first ) ) continue;
 
-      auto cc = cexpr_t{ c, next_candidate.second+1 };
+      auto cc = cexpr_t{ c.first, next_candidate.second + c.second };
       on_expression( cc );
 
-      if ( is_concrete( ctx, c ) )
+      if ( is_concrete( ctx, c.first ) )
       {
         on_concrete_expression(cc);
       }

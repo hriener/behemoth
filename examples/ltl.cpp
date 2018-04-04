@@ -113,7 +113,7 @@ int main( int argc, char *argv[] )
   const auto _next = ctx.make_fun( "X", { _N } );
   const auto _until = ctx.make_fun( "U", { _N, _N }, behemoth::expr_attr_enum::_idempotent );
 
-  rules.push_back( behemoth::rule_t{ _N, _not } );
+  rules.push_back( behemoth::rule_t{ _N, _not, /* cost = */0u } );
   rules.push_back( behemoth::rule_t{ _N, _and } );
   rules.push_back( behemoth::rule_t{ _N, _or } );
   rules.push_back( behemoth::rule_t{ _N, _globally } );

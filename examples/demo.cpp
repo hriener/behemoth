@@ -74,7 +74,7 @@ int main( int argc, char *argv[] )
   const auto _not = ctx.make_fun( "not", { _N }, expr_attr_enum::_no_double_application );
   const auto _and = ctx.make_fun( "and", { _N, _N }, expr_attr_enum::_idempotent | expr_attr_enum::_commutative );
 
-  rules.push_back( rule_t{ _N, _not } );
+  rules.push_back( rule_t{ _N, _not, /* demo = */0u } );
   rules.push_back( rule_t{ _N, _and } );
 
   for ( auto i = 0; i < num_variables; ++i )

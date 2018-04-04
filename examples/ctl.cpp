@@ -128,7 +128,7 @@ int main( int argc, char *argv[] )
   const auto _universal_next = ctx.make_fun( "AX", { _N } );
   const auto _universal_until = ctx.make_fun( "AU", { _N, _N }, behemoth::expr_attr_enum::_idempotent );
 
-  rules.push_back( behemoth::rule_t{ _N, _not } );
+  rules.push_back( behemoth::rule_t{ _N, _not, /* cost = */0u } );
   rules.push_back( behemoth::rule_t{ _N, _and } );
   rules.push_back( behemoth::rule_t{ _N, _or } );
   rules.push_back( behemoth::rule_t{ _N, _existential_globally } );
