@@ -1,6 +1,6 @@
 # behemoth
 
-<img src="https://cdn.rawgit.com/hriener/behemoth/master/behemoth.svg" width="64" height="64" align="left" style="margin-right: 12pt" />
+<img src="https://cdn.rawgit.com/hriener/behemoth/66151790/behemoth.svg" width="64" height="64" align="left" style="margin-right: 12pt" />
 behemoth is a C++ library for syntax-guided enumeration and synthesis.
 
 ## Example
